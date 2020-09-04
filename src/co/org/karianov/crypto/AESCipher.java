@@ -11,27 +11,43 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
-public class AESCipher {
+public class AESCipher implements ICipher {
 	
 	private static final String CIPHER_TRANSFORMATION = "AES/ECB/PKCS5Padding";
 	private Cipher cipher;
 	
-	public AESCipher() throws NoSuchAlgorithmException, NoSuchPaddingException {
-		cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
+	public AESCipher() {
+		try {
+			cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException exception) {
+			System.err.println("Something went wrong during cipher initialization. Details: " + exception.getMessage());
+		}
 	}
 	
 	private Key generateKey() throws NoSuchAlgorithmException {
 		return new SecretKeySpec(SecurityConstants.KEY_VALUE, "AES");
 	}
 	
-	public String encrypt(String data) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException {
-		cipher.init(Cipher.ENCRYPT_MODE, generateKey());
-		return Base64.getEncoder().encodeToString(cipher.doFinal(data.getBytes()));
+	@Override
+	public String encrypt(String data) {
+		try {
+			cipher.init(Cipher.ENCRYPT_MODE, generateKey());
+			return Base64.getEncoder().encodeToString(cipher.doFinal(data.getBytes()));
+		} catch (NullPointerException | InvalidKeyException | NoSuchAlgorithmException | IllegalBlockSizeException | BadPaddingException exception) {
+			System.err.println("Something went wrong during data encryption. Details: " + exception.getMessage());
+			return null;
+		}
 	}
-	
-	public String decrypt(String data) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException {
-		cipher.init(Cipher.DECRYPT_MODE, generateKey());
-		return new String(cipher.doFinal(Base64.getDecoder().decode(data)));
+
+	@Override
+	public String decrypt(String data) {
+		try {
+			cipher.init(Cipher.DECRYPT_MODE, generateKey());
+			return new String(cipher.doFinal(Base64.getDecoder().decode(data)));
+		} catch (NullPointerException | InvalidKeyException | NoSuchAlgorithmException | IllegalBlockSizeException | BadPaddingException exception) {
+			System.err.println("Something went wrong during data decryption. Details: " + exception.getMessage());
+			return null;
+		}
 	}
 
 }
