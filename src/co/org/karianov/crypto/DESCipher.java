@@ -36,7 +36,6 @@ public class DESCipher implements ICipher {
 			return Base64.getEncoder().encodeToString(cipher.doFinal(data.getBytes()));
 		} catch (NullPointerException | InvalidKeyException | NoSuchAlgorithmException | IllegalBlockSizeException | BadPaddingException exception) {
 			System.err.println("Something went wrong during data encryption. Details: " + exception.getMessage());
-			exception.printStackTrace();
 			return null;
 		}
 	}
